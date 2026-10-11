@@ -114,6 +114,9 @@ namespace Toolbox.Editor.Drawers
             isArray = property.isArray && property.propertyType == SerializedPropertyType.Generic;
             isChild = property.name != FieldInfo.Name;
 
+            //cache flag indicating if the target type is marked with SortableAttribute
+            IsSortable = Type.IsDefined(typeof(SortableAttribute), true);
+
             //try to fetch additional data about drawers
             ProcessBuiltInData();
             ProcessToolboxData();
@@ -544,5 +547,10 @@ namespace Toolbox.Editor.Drawers
         /// Type associated to the <see cref="Property"/>.
         /// </summary>
         public Type Type { get; }
+
+        /// <summary>
+        /// Cached flag indicating if the target type is marked with <see cref="SortableAttribute"/>.
+        /// </summary>
+        public bool IsSortable { get; }
     }
 }

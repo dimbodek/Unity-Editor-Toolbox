@@ -517,9 +517,7 @@ namespace Toolbox.Editor
         public static void DrawPropertyChildren(SerializedProperty property, Action<SerializedProperty> drawElementAction = null)
         {
             var handler = ToolboxDrawersManager.GetPropertyHandler(property);
-
-            // Safely check if the parent type is marked for sorting
-            bool isSortable = handler?.Type != null && handler.Type.IsDefined(typeof(SortableAttribute), true);
+            bool isSortable = handler != null && handler.IsSortable;
 
             var enterChildren = true;
 
