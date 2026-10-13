@@ -1,18 +1,34 @@
 ﻿#if UNITY_2019_3_OR_NEWER
 using System;
 using System.Diagnostics;
+using static UnityEngine.ReferencePickerAttribute;
 
 namespace UnityEngine
 {
+
     /// <summary>
-    /// Creates dedicated drawer for fields marked with the <see cref="SerializeReference"/>.
-    /// 
-    /// <para>Supported types: any serializable type and field with the <see cref="SerializeReference"/> attribute.</para>
+    /// UI Toolkit adapter for the <see cref="ReferencePickerAttribute"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     [Conditional("UNITY_EDITOR")]
-    public class CustomReferencePickerAttribute : PropertyAttribute
+    public class CustomReferencePickerAttribute : PropertyAttribute, IReferencePickerAttribute
     {
+
+        /// <inheritdoc />
+        public Type ParentType { get; set; }
+
+        /// <inheritdoc />
+        public bool ForceUninitializedInstance { get; set; }
+
+        /// <inheritdoc />
+        public TypeGrouping TypeGrouping { get; set; }
+
+        /// <inheritdoc />
+        public bool AddTextSearchField { get; set; }
+
+        /// <inheritdoc />
+        public bool AddConfirmationBox { get; set; }
+
         public CustomReferencePickerAttribute()
         { }
 
@@ -25,28 +41,6 @@ namespace UnityEngine
             TypeGrouping = typeGrouping;
         }
 
-        public Type ParentType { get; set; }
-
-        /// <summary>
-        /// Indicates if created instance should be uninitialized.
-        /// </summary>
-        public bool ForceUninitializedInstance { get; set; }
-
-        /// <summary>
-        /// Gets or sets grouping of selectable classes.
-        /// Defaults to <see cref="TypeGrouping.None"/> unless explicitly specified.
-        /// </summary>
-        public TypeGrouping TypeGrouping { get; set; } = TypeGrouping.None;
-
-        /// <summary>
-        /// Indicates if created popup menu should have an additional search field.
-        /// </summary>
-        public bool AddTextSearchField { get; set; } = true;
-
-        /// <summary>
-        /// Indicates if confirmation box should appear after picking a new reference. 
-        /// </summary>
-        public bool AddConfirmationBox { get; set; }
     }
 }
 #endif

@@ -3,26 +3,69 @@ using System;
 
 using UnityEditor;
 using UnityEngine;
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
 namespace Toolbox.Editor.Drawers
 {
     using Toolbox.Editor.Internal;
     using Toolbox.Editor.Internal.Types;
+    using static UnityEngine.ReferencePickerAttribute;
 
     public class ReferencePickerAttributeDrawer : ToolboxSelfPropertyDrawer<ReferencePickerAttribute>
     {
+
+        /// <summary>
+        /// Nested drawer specifically for the UI Toolkit adapter attribute.
+        /// </summary>
+        [CustomPropertyDrawer(typeof(CustomReferencePickerAttribute))]
+        public class CustomReferencePickerAttributeDrawer: PropertyDrawer
+        {
+
+            public override VisualElement CreatePropertyGUI(SerializedProperty property)
+            {
+                var root = new VisualElement();
+                var attr = (CustomReferencePickerAttribute)attribute;
+
+                // Render the default UI Toolkit property field (handles children automatically)
+                var propertyField = new PropertyField(property);
+                root.Add(propertyField);
+
+                // Overlay the custom IMGUI-based type picker dropdown
+                var imguiContainer = new IMGUIContainer(() =>
+                {
+                    UpdateContexts(attr);
+                    var parentType = GetParentType(attr, property);
+                    Rect position = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight);
+                    CreateTypeProperty(property, parentType, attr, position);
+                });
+
+                // Position absolute to overlay the native dropdown, offsetting left to avoid overlapping the property label
+                imguiContainer.style.left = new StyleLength(Length.Percent(42));
+                imguiContainer.style.position = Position.Absolute;
+                imguiContainer.style.top = 0;
+                imguiContainer.style.right = 0;
+
+                root.Add(imguiContainer);
+
+                return root;
+            }
+
+        }
+
         private const float labelWidthOffset = -80.0f;
 
         private static readonly TypeConstraintContext sharedConstraint = new TypeConstraintSerializeReference(null);
         private static readonly TypeAppearanceContext sharedAppearance = new TypeAppearanceContext(sharedConstraint, TypeGrouping.None, true);
         private static readonly TypeField typeField = new TypeField(sharedConstraint, sharedAppearance);
 
-        private void UpdateContexts(ReferencePickerAttribute attribute)
+        private static void UpdateContexts(IReferencePickerAttribute attribute)
         {
             sharedAppearance.TypeGrouping = attribute.TypeGrouping;
         }
 
-        private Type GetParentType(ReferencePickerAttribute attribute, SerializedProperty property)
+        private static Type GetParentType<T>(T attribute, SerializedProperty property)
+            where T : Attribute, IReferencePickerAttribute
         {
             var fieldInfo = property.GetFieldInfo(out _);
             var fieldType = property.GetProperType(fieldInfo);
@@ -73,7 +116,7 @@ namespace Toolbox.Editor.Drawers
             return targetType;
         }
 
-        private void CreateTypeProperty(SerializedProperty property, Type parentType, ReferencePickerAttribute attribute, Rect position)
+        private static void CreateTypeProperty(SerializedProperty property, Type parentType, IReferencePickerAttribute attribute, Rect position)
         {
             var searchFieldRequired = attribute.AddTextSearchField;
             var confirmationRequired = attribute.AddConfirmationBox;
@@ -119,10 +162,10 @@ namespace Toolbox.Editor.Drawers
                     ToolboxEditorLog.LogWarning("Invalid attempt to update disposed property.");
                 }
             }, currentType, parentType);
-            EditorGUI.showMixedValue = false;
+            EditorGUI.showMixedValue = hadMixedValues;
         }
 
-        private void UpdateTypeProperty(SerializedProperty property, Type targetType, ReferencePickerAttribute attribute)
+        private static void UpdateTypeProperty(SerializedProperty property, Type targetType, IReferencePickerAttribute attribute)
         {
             var forceUninitializedInstance = attribute.ForceUninitializedInstance;
             var newInstance = ReflectionUtility.CreateInstance(targetType, forceUninitializedInstance);
@@ -136,7 +179,7 @@ namespace Toolbox.Editor.Drawers
             DrawerStorageManager.ClearStorages();
         }
 
-        private Rect PrepareTypePropertyPosition(bool hasLabel, in Rect labelPosition, in Rect inputPosition, bool isPropertyExpanded)
+        private static Rect PrepareTypePropertyPosition(bool hasLabel, in Rect labelPosition, in Rect inputPosition, bool isPropertyExpanded)
         {
             var position = new Rect(inputPosition);
             if (!hasLabel)
