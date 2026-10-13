@@ -431,8 +431,8 @@ namespace Toolbox.Editor.Drawers
         /// </summary>
         internal static ToolboxPropertyHandler GetPropertyHandler(SerializedProperty property)
         {
-            if (ToolboxEditorHandler.InToolboxEditor)
-            {
+            //if (ToolboxEditorHandler.InToolboxEditor)
+            //{
                 //NOTE: maybe type-based key?
                 var propertyKey = property.GetPropertyHashKey();
                 if (propertyHandlers.TryGetValue(propertyKey, out var propertyHandler))
@@ -449,12 +449,12 @@ namespace Toolbox.Editor.Drawers
                 }
 
                 return propertyHandlers[propertyKey] = new ToolboxPropertyHandler(property);
-            }
-            else
-            {
-                ToolboxEditorLog.LogWarning("Do not use Toolbox-related drawers outside ToolboxEditor.");
-                return null;
-            }
+            //}
+            //else
+            //{
+            //    ToolboxEditorLog.LogWarning("Do not use Toolbox-related drawers outside ToolboxEditor.");
+            //    return null;
+            //}
         }
 
         internal static bool ToolboxDrawersAllowed { get; set; }
