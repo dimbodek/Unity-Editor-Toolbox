@@ -11,7 +11,7 @@ namespace UnityEngine
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     [Conditional("UNITY_EDITOR")]
-    public class CustomReferencePickerAttribute : PropertyAttribute, IReferencePickerAttribute
+    public class SubclassPickerAttribute : PropertyAttribute, IReferencePickerAttribute
     {
 
         /// <inheritdoc />
@@ -29,13 +29,13 @@ namespace UnityEngine
         /// <inheritdoc />
         public bool AddConfirmationBox { get; set; }
 
-        public CustomReferencePickerAttribute()
+        public SubclassPickerAttribute()
         { }
 
-        public CustomReferencePickerAttribute(Type parentType) : this(parentType, TypeGrouping.None)
+        public SubclassPickerAttribute(Type parentType) : this(parentType, TypeGrouping.None)
         { }
 
-        public CustomReferencePickerAttribute(Type parentType, TypeGrouping typeGrouping)
+        public SubclassPickerAttribute(Type parentType, TypeGrouping typeGrouping)
         {
             ParentType   = parentType;
             TypeGrouping = typeGrouping;

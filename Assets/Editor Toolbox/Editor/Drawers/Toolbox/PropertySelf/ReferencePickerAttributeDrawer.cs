@@ -18,14 +18,14 @@ namespace Toolbox.Editor.Drawers
         /// <summary>
         /// Nested drawer specifically for the UI Toolkit adapter attribute.
         /// </summary>
-        [CustomPropertyDrawer(typeof(CustomReferencePickerAttribute))]
-        public class CustomReferencePickerAttributeDrawer: PropertyDrawer
+        [CustomPropertyDrawer(typeof(SubclassPickerAttribute))]
+        public class SubclassPickerAttributeDrawer: PropertyDrawer
         {
 
             public override VisualElement CreatePropertyGUI(SerializedProperty property)
             {
                 var root = new VisualElement();
-                var attr = (CustomReferencePickerAttribute)attribute;
+                var attr = (SubclassPickerAttribute)attribute;
 
                 // Render the default UI Toolkit property field (handles children automatically)
                 var propertyField = new PropertyField(property);
