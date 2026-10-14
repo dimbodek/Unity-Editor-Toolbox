@@ -22,16 +22,23 @@ namespace Toolbox.Editor.Drawers
         public class SubclassPickerAttributeDrawer: PropertyDrawer
         {
 
+            class TypeField : BaseField<bool>
+            {
+                public TypeField(string label, VisualElement visualInput) : base(label, visualInput) 
+                {
+                    
+                }
+            }
+
             public override VisualElement CreatePropertyGUI(SerializedProperty property)
             {
                 var root = new VisualElement();
+                //root.AddToClassList("unity-toggle");
                 var attr = (SubclassPickerAttribute)attribute;
 
-                // Render the default UI Toolkit property field (handles children automatically)
                 var propertyField = new PropertyField(property);
                 root.Add(propertyField);
 
-                // Overlay the custom IMGUI-based type picker dropdown
                 var imguiContainer = new IMGUIContainer(() =>
                 {
                     UpdateContexts(attr);
@@ -40,13 +47,20 @@ namespace Toolbox.Editor.Drawers
                     CreateTypeProperty(property, parentType, attr, position);
                 });
 
-                // Position absolute to overlay the native dropdown, offsetting left to avoid overlapping the property label
-                imguiContainer.style.left = new StyleLength(Length.Percent(42));
-                imguiContainer.style.position = Position.Absolute;
-                imguiContainer.style.top = 0;
-                imguiContainer.style.right = 0;
+                var typeField = new TypeField(property.displayName, imguiContainer);
+                typeField.AddToClassList(BaseField<object>.alignedFieldUssClassName);
+                typeField.style.position = Position.Absolute;
+                typeField.style.top = 0;
+                typeField.style.right = 0;
+                typeField.style.left = 0;
+                typeField.pickingMode = PickingMode.Ignore;
+                typeField.focusable = false;
 
-                root.Add(imguiContainer);
+                typeField.labelElement.pickingMode = PickingMode.Ignore;
+                typeField.labelElement.focusable = false;
+                typeField.labelElement.style.opacity = 0;
+
+                root.Add(typeField);
 
                 return root;
             }
